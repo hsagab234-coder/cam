@@ -140,48 +140,85 @@ async function startStreaming() {
 // ========================
 
 function initViewer(targetId) {
+    const statusMsg = document.getElementById('overlay-msg');
+    statusMsg.innerText = "Inicializando conexão...";
+
     peer = new Peer();
 
-    peer.on('open', () => {
-        console.log('Conectando ao ID:', targetId);
+    peer.on('open', (myId) => {
+        console.log('Viewer ID:', myId);
+        statusMsg.innerText = "Conectado ao servidor. Buscando câmera...";
+        // Tenta conectar imediatamente via dados e vídeo
         connectToBroadcaster(targetId);
     });
 
     peer.on('error', (err) => {
         console.error(err);
-        overlayMsg.innerText = "Erro na conexão: " + err.type;
-        // Tenta reconectar em breve se for desconexão
+        let msg = "Erro desconhecido";
+        if (err.type === 'peer-unavailable') msg = "Câmera não encontrada (ID incorreto ou offline).";
+        if (err.type === 'network') msg = "Erro de rede / Falha na conexão.";
+        if (err.type === 'browser-incompatible') msg = "Navegador incompatível.";
+
+        statusMsg.innerHTML = `<span style="color: #ff5555">${msg}</span><br><small>${err.type}</small>`;
     });
 }
 
 function connectToBroadcaster(targetId) {
+    const statusMsg = document.getElementById('overlay-msg');
+
+    // 1. Tenta estabelecer canal de dados (para confirmar status)
     const conn = peer.connect(targetId);
 
     conn.on('open', () => {
-        console.log("Conexão de dados aberta");
-        // Inicia a chamada de vídeo
-        const call = peer.call(targetId, null); // Call sem enviar stream (apenas receber)
+        console.log("Conexão de dados estabelecida");
+        statusMsg.innerText = "Sinal encontrado. Solicitando vídeo...";
+    });
+
+    conn.on('close', () => {
+        console.log("Host desconectou");
+        statusMsg.innerText = "Câmera desconectada.";
+    });
+
+    // 2. Tenta iniciar chamada de vídeo (Pull)
+    // Pequeno delay para garantir que o PeerJS registrou o peer remoto se for muito rápido
+    setTimeout(() => {
+        console.log("Iniciando chamada de vídeo para:", targetId);
+
+        // Passamos 'null' ou um stream vazio pois só queremos receber
+        const call = peer.call(targetId, null);
+
+        if (!call) {
+            statusMsg.innerText = "Falha ao iniciar chamada (PeerJS retornou null).";
+            return;
+        }
 
         call.on('stream', (remoteStream) => {
-            console.log("Stream recebido!");
+            console.log("Stream de vídeo recebido!");
             remoteVideo.srcObject = remoteStream;
-            overlayMsg.style.display = 'none'; // Esconde msg de aguardando
+
+            // Garantir que o play ocorra (necessário para OBS browser source às vezes)
+            const playPromise = remoteVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.error("Auto-play prevented:", error);
+                    statusMsg.innerText = "Clique para iniciar vídeo (Auto-play bloqueado).";
+                });
+            }
+
+            statusMsg.style.display = 'none'; // Sucesso!
         });
 
         call.on('close', () => {
-            overlayMsg.innerText = "Transmissão encerrada.";
-            overlayMsg.style.display = 'block';
+            statusMsg.style.display = 'block';
+            statusMsg.innerText = "Transmissão encerrada pelo host.";
         });
 
         call.on('error', (err) => {
             console.error("Erro na chamada:", err);
+            statusMsg.innerText = "Erro na chamada de vídeo: " + err.type;
         });
-    });
 
-    conn.on('close', () => {
-        overlayMsg.innerText = "Desconectado do host.";
-        overlayMsg.style.display = 'block';
-    });
+    }, 1000);
 }
 
 // Inicializa
