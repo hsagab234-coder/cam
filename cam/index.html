@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBS Cam Link</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+</head>
+<body>
+
+    <!-- Interface do Transmissor (Celular) -->
+    <div id="broadcaster-ui" class="container" style="display: none;">
+        <h1>🎥 OBS Cam Mobile</h1>
+        <p>Conecte a câmera do seu celular ao OBS.</p>
+        
+        <div class="preview-container">
+            <video id="local-video" autoplay playsinline muted></video>
+        </div>
+
+        <div class="controls">
+            <label for="camera-select">Escolha a Câmera:</label>
+            <select id="camera-select">
+                <option value="">Carregando câmeras...</option>
+            </select>
+            
+            <button id="start-btn">Iniciar Câmera</button>
+        </div>
+
+        <div id="connection-info" class="hidden">
+            <h3>🔗 Link para o OBS:</h3>
+            <div class="link-box">
+                <input type="text" id="obs-link" readonly>
+                <button id="copy-btn">Copiar</button>
+            </div>
+            <p class="status">Status: <span id="status-text">Aguardando conexão...</span></p>
+        </div>
+    </div>
+
+    <!-- Interface do Receptor (OBS) -->
+    <div id="viewer-ui" style="display: none;">
+        <video id="remote-video" autoplay playsinline></video>
+        <div id="overlay-msg">Aguardando câmera...</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

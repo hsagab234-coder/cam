@@ -1,0 +1,149 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    height: 100vh;
+    overflow: hidden; /* Evita barras de rolagem no OBS */
+}
+
+.container {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+h1 {
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+
+p {
+    color: #ccc;
+    margin-bottom: 20px;
+}
+
+/* Container do Vídeo Local */
+.preview-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 20px;
+    border: 2px solid #333;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #000;
+    aspect-ratio: 9/16; /* Formato vertical comum de celular */
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Controles */
+.controls {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+select {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background: #333;
+    color: white;
+    width: 80%;
+    max-width: 300px;
+}
+
+button {
+    padding: 12px 24px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    width: 80%;
+    max-width: 300px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Área do Link */
+.hidden {
+    display: none;
+}
+
+#connection-info {
+    margin-top: 20px;
+    padding: 15px;
+    background: #252525;
+    border-radius: 8px;
+}
+
+.link-box {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #444;
+    background: #111;
+    color: #0f0;
+    font-family: monospace;
+}
+
+.status {
+    font-size: 0.9em;
+    color: #888;
+}
+
+/* Estilos Específicos para o Viewer (OBS) */
+#viewer-ui {
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+#remote-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Mantém a proporção sem cortar, pode usar 'cover' se preferir preencher tudo */
+}
+
+#overlay-msg {
+    position: absolute;
+    color: white;
+    font-size: 24px;
+    background: rgba(0,0,0,0.7);
+    padding: 20px;
+    border-radius: 10px;
+    pointer-events: none; /* Deixa transparente a cliques */
+}
